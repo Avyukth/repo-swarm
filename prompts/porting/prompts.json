@@ -1,0 +1,36 @@
+{
+  "_comment": "Porting prompts - specialized for TS to Rust migration workflows",
+  "_usage": "Run these in separate sessions: 1) typescript_source_analysis on TS repo, 2) rust_target_analysis on Rust repo, 3) parity_check with both",
+  "processing_order": [
+    {
+      "name": "typescript_source_analysis",
+      "file": "typescript_source_analysis.md",
+      "description": "Comprehensive TypeScript source codebase analysis for porting blueprint"
+    },
+    {
+      "name": "rust_mapping",
+      "file": "rust_mapping.md",
+      "description": "TypeScript to Rust type and pattern mappings",
+      "context": [
+        {"type": "step", "val": "typescript_source_analysis"}
+      ]
+    }
+  ],
+  "additional_prompts": [
+    {
+      "name": "rust_target_analysis",
+      "file": "rust_target_analysis.md",
+      "description": "Comprehensive Rust target codebase analysis (run on Rust repo separately)"
+    },
+    {
+      "name": "delta_analysis",
+      "file": "delta_analysis.md",
+      "description": "Analyze changes since last port baseline (requires git diff context)"
+    },
+    {
+      "name": "parity_check",
+      "file": "parity_check.md",
+      "description": "Compare TS source with Rust port for feature parity (requires both repo contexts)"
+    }
+  ]
+}
