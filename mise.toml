@@ -162,6 +162,59 @@ investigate-debug = "scripts/repo-debug.sh"
 # Use when: freeing disk space, resetting test environment, or cleaning up after investigation runs
 cleanup-temp = "scripts/clean.sh"
 
+# ============================================================
+# ANTIGRAVITY PROXY TASKS (Free Claude via Google OAuth)
+# ============================================================
+
+# Check if antigravity proxy is running
+# Use when: verifying proxy status before running investigations
+proxy-status = """
+    if curl -s http://localhost:8080/health > /dev/null 2>&1; then
+        echo "✅ Antigravity proxy is running"
+        curl -s "http://localhost:8080/account-limits?format=table"
+    else
+        echo "❌ Proxy not running. Start with: mise proxy-start"
+    fi
+"""
+
+# Start the antigravity proxy server
+# Use when: starting local proxy for free Claude access via Google OAuth
+proxy-start = """
+    echo "🚀 Starting antigravity-claude-proxy..."
+    echo "📝 Make sure you have added accounts: npx antigravity-claude-proxy accounts add"
+    npx antigravity-claude-proxy start
+"""
+
+# Add a Google account to antigravity proxy
+# Use when: first-time setup or adding additional Google accounts for load balancing
+proxy-add-account = """
+    echo "🔐 Adding Google account to antigravity proxy..."
+    npx antigravity-claude-proxy accounts add
+"""
+
+# List and manage proxy accounts
+# Use when: checking account status or managing multiple accounts
+proxy-accounts = "npx antigravity-claude-proxy accounts"
+
+# Investigate using proxy (convenience wrapper - uses Temporal)
+# Usage: mise proxy-investigate REPO_URL
+# Use when: running investigation with antigravity proxy via Temporal workflow
+proxy-investigate = """
+    if ! curl -s http://localhost:8080/health > /dev/null 2>&1; then
+        echo "❌ Proxy not running. Start with: mise proxy-start"
+        exit 1
+    fi
+    export ANTHROPIC_BASE_URL="http://localhost:8080"
+    export ANTHROPIC_API_KEY="test"
+    echo "🔗 Using antigravity proxy at $ANTHROPIC_BASE_URL"
+    scripts/single.sh $@
+"""
+
+# Direct investigation without Temporal (faster for single repos)
+# Usage: mise investigate-direct REPO_URL
+# Use when: quick single repo analysis without Temporal overhead
+investigate-direct = "scripts/investigate-direct.sh"
+
 # Test both unit and integration tests
 # Runs the complete test suite including unit and integration tests
 # Use when: comprehensive testing before commits, CI/CD pipelines, or verifying overall system health

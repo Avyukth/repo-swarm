@@ -10,9 +10,10 @@ from .config import Config
 class ClaudeAnalyzer:
     """Handles Claude API interactions for analysis."""
     
-    def __init__(self, api_key: str, logger):
-        self.client = Anthropic(api_key=api_key)
+    def __init__(self, api_key: str, logger, base_url: Optional[str] = None):
+        self.client = Anthropic(api_key=api_key, base_url=base_url) if base_url else Anthropic(api_key=api_key)
         self.logger = logger
+        self.base_url = base_url
     
     def clean_prompt(self, prompt_template: str) -> str:
         """

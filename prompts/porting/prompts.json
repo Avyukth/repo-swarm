@@ -1,26 +1,66 @@
 {
-  "_comment": "Porting prompts - specialized for TS to Rust migration workflows",
-  "_usage": "Run these in separate sessions: 1) typescript_source_analysis on TS repo, 2) rust_target_analysis on Rust repo, 3) parity_check with both",
+  "_comment": "Porting prompts - specialized for source-to-Rust migration workflows",
+  "_usage": "Run analysis on source repo, then optionally on existing Rust target for parity check",
+  "_supported_sources": ["TypeScript", "Go"],
+  
+  "variants": {
+    "typescript": {
+      "processing_order": [
+        {
+          "name": "typescript_source_analysis",
+          "file": "typescript_source_analysis.md",
+          "description": "Comprehensive TypeScript source codebase analysis for porting blueprint"
+        },
+        {
+          "name": "rust_mapping",
+          "file": "rust_mapping.md",
+          "description": "TypeScript to Rust type and pattern mappings",
+          "context": [
+            {"type": "step", "val": "typescript_source_analysis"}
+          ]
+        }
+      ]
+    },
+    "go": {
+      "processing_order": [
+        {
+          "name": "go_source_analysis",
+          "file": "go_source_analysis.md",
+          "description": "Comprehensive Go source codebase analysis for Rust porting blueprint"
+        },
+        {
+          "name": "go_to_rust_mapping",
+          "file": "go_to_rust_mapping.md",
+          "description": "Go to Rust type, pattern, and test mappings",
+          "context": [
+            {"type": "step", "val": "go_source_analysis"}
+          ]
+        }
+      ]
+    }
+  },
+
   "processing_order": [
     {
-      "name": "typescript_source_analysis",
-      "file": "typescript_source_analysis.md",
-      "description": "Comprehensive TypeScript source codebase analysis for porting blueprint"
+      "name": "go_source_analysis",
+      "file": "go_source_analysis.md",
+      "description": "Comprehensive Go source codebase analysis for Rust porting blueprint"
     },
     {
-      "name": "rust_mapping",
-      "file": "rust_mapping.md",
-      "description": "TypeScript to Rust type and pattern mappings",
+      "name": "go_to_rust_mapping",
+      "file": "go_to_rust_mapping.md",
+      "description": "Go to Rust type, pattern, and test mappings",
       "context": [
-        {"type": "step", "val": "typescript_source_analysis"}
+        {"type": "step", "val": "go_source_analysis"}
       ]
     }
   ],
+
   "additional_prompts": [
     {
       "name": "rust_target_analysis",
       "file": "rust_target_analysis.md",
-      "description": "Comprehensive Rust target codebase analysis (run on Rust repo separately)"
+      "description": "Comprehensive Rust target codebase analysis (run on existing Rust port)"
     },
     {
       "name": "delta_analysis",
@@ -30,7 +70,12 @@
     {
       "name": "parity_check",
       "file": "parity_check.md",
-      "description": "Compare TS source with Rust port for feature parity (requires both repo contexts)"
+      "description": "Compare source with Rust port for feature parity (requires both repo contexts)"
     }
-  ]
+  ],
+
+  "config": {
+    "type": "porting",
+    "default_variant": "go"
+  }
 }

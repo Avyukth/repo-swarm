@@ -21,6 +21,9 @@ dev = [
     "boto3",
 ]
 
+[project.scripts]
+repo-swarm-auth = "src.auth.cli:main"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
@@ -32,4 +35,5 @@ packages = ["src"]
 dev-dependencies = [
     "moto[dynamodb]",
     "boto3",
+    "pytest-cov>=7.0.0",
 ]

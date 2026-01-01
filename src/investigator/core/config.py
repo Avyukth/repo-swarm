@@ -9,20 +9,35 @@ class Config:
     """Configuration constants for the investigator."""
     
     # Claude API settings
-    CLAUDE_MODEL = "claude-opus-4-5-20251101"
+    # Default model - can be overridden via CLAUDE_MODEL env var
+    # For Antigravity proxy, use models like: claude-opus-4-5-thinking, claude-sonnet-4-5
+    CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-opus-4-5-thinking")
+    
+    # Anthropic API base URL - for proxy support (e.g., antigravity-claude-proxy)
+    # Set ANTHROPIC_BASE_URL=http://localhost:8080 to use local proxy
+    ANTHROPIC_BASE_URL = os.getenv("ANTHROPIC_BASE_URL", None)
     MAX_TOKENS = 6000
     
-    # Valid Claude model names for validation (4.x models only)
-    # See: https://platform.claude.com/docs/en/about-claude/models/overview
+    # Valid Claude model names for validation
+    # Includes both direct Anthropic API models and Antigravity proxy models
     VALID_CLAUDE_MODELS = [
-        # Claude 4.5 (current)
+        # Direct Anthropic API models (with date suffix)
+        # See: https://platform.claude.com/docs/en/about-claude/models/overview
         "claude-sonnet-4-5-20250929",
         "claude-haiku-4-5-20251001",
-        "claude-opus-4-5-20251101",  # current default
+        "claude-opus-4-5-20251101",
         "claude-opus-4-1-20250805",
-        # Claude 4.0 (legacy)
         "claude-sonnet-4-20250514",
         "claude-opus-4-20250514",
+        # Antigravity proxy models (via antigravity-claude-proxy)
+        # See: https://github.com/badri-s2001/antigravity-claude-proxy
+        "claude-opus-4-5-thinking",
+        "claude-sonnet-4-5",
+        "claude-sonnet-4-5-thinking",
+        # Gemini models via Antigravity
+        "gemini-3-pro-high",
+        "gemini-3-pro-low",
+        "gemini-3-flash",
     ]
     
     # File settings

@@ -38,11 +38,24 @@ def validate_environment():
     except ValueError as e:
         errors.append(f"Invalid max tokens: {e}")
 
-    # Required API keys
-    if not os.getenv('ANTHROPIC_API_KEY'):
-        errors.append("ANTHROPIC_API_KEY environment variable is required for Claude API access")
-    else:
-        logger.info("  ✓ Anthropic API key present")
+    # Required API keys - check via auth module first (supports OAuth + API key)
+    try:
+        from auth import get_claude_token, AuthError
+        try:
+            get_claude_token()
+            logger.info("  ✓ Anthropic credentials present (via auth module)")
+        except AuthError:
+            # Fall back to env var check for backward compatibility
+            if not os.getenv('ANTHROPIC_API_KEY'):
+                errors.append("No Anthropic credentials found. Set ANTHROPIC_API_KEY or run 'repo-swarm-auth login'")
+            else:
+                logger.info("  ✓ Anthropic API key present")
+    except ImportError:
+        # Auth module not available, fall back to env var
+        if not os.getenv('ANTHROPIC_API_KEY'):
+            errors.append("ANTHROPIC_API_KEY environment variable is required for Claude API access")
+        else:
+            logger.info("  ✓ Anthropic API key present")
 
     if not os.getenv('GITHUB_TOKEN'):
         errors.append("GITHUB_TOKEN environment variable is required for GitHub API access")

@@ -610,10 +610,18 @@ async def analyze_with_claude_context(input_params: AnalyzeWithClaudeInput) -> A
         # Create a logger for the ClaudeAnalyzer
         logger = logging.getLogger(__name__)
         
-        # Initialize Claude analyzer
-        api_key = os.getenv('ANTHROPIC_API_KEY')
+        # Initialize Claude analyzer - try auth module first, fall back to env var
+        try:
+            from auth import get_claude_token, AuthError
+            try:
+                api_key = get_claude_token()
+            except AuthError:
+                api_key = os.getenv('ANTHROPIC_API_KEY')
+        except ImportError:
+            api_key = os.getenv('ANTHROPIC_API_KEY')
+        
         if not api_key:
-            raise Exception("Claude API key not configured. Set ANTHROPIC_API_KEY environment variable.")
+            raise Exception("Claude API key not configured. Set ANTHROPIC_API_KEY or run 'repo-swarm-auth login'.")
             
         claude_analyzer = ClaudeAnalyzer(api_key, logger)
         

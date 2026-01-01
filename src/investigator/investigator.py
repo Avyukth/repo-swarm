@@ -15,10 +15,10 @@ try:
         Utils,
         GitRepositoryManager,
         RepositoryAnalyzer,
-        ClaudeAnalyzer,
         FileManager,
         RepositoryTypeDetector
     )
+    from .core.claude_analyzer import ClaudeAnalyzer
     from .activity_wrapper import ActivityWrapper
 except ImportError:
     # Fall back to absolute import (when run directly)
@@ -27,10 +27,10 @@ except ImportError:
         Utils,
         GitRepositoryManager,
         RepositoryAnalyzer,
-        ClaudeAnalyzer,
         FileManager,
         RepositoryTypeDetector
     )
+    from core.claude_analyzer import ClaudeAnalyzer
     from activity_wrapper import ActivityWrapper
 
 
@@ -52,17 +52,33 @@ class ClaudeInvestigator:
         self._setup_logging(log_level)
         self.logger = logging.getLogger(__name__)
         
-        self.api_key = api_key or os.getenv('ANTHROPIC_API_KEY')
+        # Try auth module first, fall back to env var, then explicit api_key param
+        self.base_url = None
+        if api_key:
+            self.api_key = api_key
+        else:
+            try:
+                from auth import get_claude_token, get_anthropic_base_url, AuthError
+                try:
+                    self.api_key = get_claude_token()
+                    self.base_url = get_anthropic_base_url()
+                except AuthError:
+                    self.api_key = os.getenv('ANTHROPIC_API_KEY')
+                    self.base_url = os.getenv('ANTHROPIC_BASE_URL')
+            except ImportError:
+                self.api_key = os.getenv('ANTHROPIC_API_KEY')
+                self.base_url = os.getenv('ANTHROPIC_BASE_URL')
+        
         if not self.api_key:
             self.logger.error("Claude API key is required")
-            raise ValueError("Claude API key is required. Set ANTHROPIC_API_KEY environment variable or pass api_key parameter.")
+            raise ValueError("Claude API key is required. Set ANTHROPIC_API_KEY, run 'repo-swarm-auth login', or pass api_key parameter.")
         
         self.logger.info("Initializing Claude Investigator")
         
         # Initialize components
         self.git_manager = GitRepositoryManager(self.logger)
         self.repo_analyzer = RepositoryAnalyzer(self.logger)
-        self.claude_analyzer = ClaudeAnalyzer(self.api_key, self.logger)
+        self.claude_analyzer = ClaudeAnalyzer(self.api_key, self.logger, self.base_url)
         self.file_manager = FileManager(self.logger)
         self.type_detector = RepositoryTypeDetector(self.logger)
         

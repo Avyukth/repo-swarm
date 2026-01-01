@@ -206,3 +206,5 @@ src/investigator/graph/graph_json/
 
 # bv (beads viewer) local config and caches
 .bv/
+.claude/memory/
+data/
