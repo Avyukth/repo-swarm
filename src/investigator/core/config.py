@@ -7,12 +7,19 @@ import os
 
 class Config:
     """Configuration constants for the investigator."""
-    
-    # Claude API settings
-    # Default model - can be overridden via CLAUDE_MODEL env var
+
+    # LLM Provider settings (multi-provider support)
+    # LLM_PROVIDER: anthropic (default), openai, gemini, glm
+    LLM_PROVIDER = os.getenv("LLM_PROVIDER", "anthropic")
+
+    # LLM_MODEL: Override model for any provider (uses provider default if not set)
+    LLM_MODEL = os.getenv("LLM_MODEL", None)
+
+    # Claude API settings (legacy, for backward compatibility)
+    # Default model - can be overridden via CLAUDE_MODEL or LLM_MODEL env var
     # For Antigravity proxy, use models like: claude-opus-4-5-thinking, claude-sonnet-4-5
-    CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-opus-4-5-thinking")
-    
+    CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", os.getenv("LLM_MODEL", "claude-opus-4-5-thinking"))
+
     # Anthropic API base URL - for proxy support (e.g., antigravity-claude-proxy)
     # Set ANTHROPIC_BASE_URL=http://localhost:8080 to use local proxy
     ANTHROPIC_BASE_URL = os.getenv("ANTHROPIC_BASE_URL", None)

@@ -38,6 +38,9 @@ DEFAULT_ENV_VAR_NAMES: Dict[str, str] = {
     "openai": "OPENAI_API_KEY",
     "google": "GOOGLE_API_KEY",
     "gemini": "GEMINI_API_KEY",
+    "glm": "GLM_API_KEY",
+    "zhipu": "GLM_API_KEY",
+    "exa": "EXA_API_KEY",
 }
 
 ANTHROPIC_BASE_URL_ENV = "ANTHROPIC_BASE_URL"
