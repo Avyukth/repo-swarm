@@ -80,8 +80,15 @@ PROVIDER_CONFIGS: Dict[str, ProviderConfig] = {
     "glm": ProviderConfig(
         env_var="GLM_API_KEY",
         base_url_env_var="GLM_BASE_URL",
-        default_model="glm-4-plus",
+        default_model="glm-4.5-flash",
         valid_models=[
+            # Z.AI / OpenCode models (OpenAI-compatible endpoint)
+            "glm-4.7",  # Reasoning model, 204800 context
+            "glm-4.5-flash",  # Fast model
+            "glm-z1-flash",  # Ultra-fast reasoning
+            "glm-z1-air",  # Balanced reasoning
+            "glm-z1-airx",  # Extended reasoning
+            # Native ZhipuAI models
             "glm-4-plus",
             "glm-4",
             "glm-4-flash",
